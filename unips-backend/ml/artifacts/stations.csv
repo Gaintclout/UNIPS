@@ -1,0 +1,11 @@
+code,name,location_name,latitude,longitude,status,zone
+HYD01,HYD01 Monitoring Station,Hyderabad HYD01,17.385,78.4867,active,Hyderabad
+HYD02,HYD02 Monitoring Station,Hyderabad HYD02,17.4065,78.4772,active,Hyderabad
+HYD03,HYD03 Monitoring Station,Hyderabad HYD03,17.4948,78.3927,active,Hyderabad
+HYD04,HYD04 Monitoring Station,Hyderabad HYD04,17.3616,78.4747,active,Hyderabad
+HYD05,HYD05 Monitoring Station,Hyderabad HYD05,17.4474,78.3762,active,Hyderabad
+HYD06,HYD06 Monitoring Station,Hyderabad HYD06,17.426,78.4573,active,Hyderabad
+HYD07,HYD07 Monitoring Station,Hyderabad HYD07,17.4483,78.3915,active,Hyderabad
+HYD08,HYD08 Monitoring Station,Hyderabad HYD08,17.4931,78.411,active,Hyderabad
+HYD09,HYD09 Monitoring Station,Hyderabad HYD09,17.3871,78.4916,active,Hyderabad
+HYD10,HYD10 Monitoring Station,Hyderabad HYD10,17.4126,78.4484,active,Hyderabad
