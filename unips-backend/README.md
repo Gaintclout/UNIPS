@@ -52,3 +52,10 @@ WebSockets:
 
 - `ws://localhost:8000/ws/stations`
 - `ws://localhost:8000/ws/alerts`
+
+APP_NAME=UNIPS Backend
+ENVIRONMENT=development
+DATABASE_URL=postgresql+psycopg2://postgres:new_strong_password@localhost:5432/unips
+SECRET_KEY=change-this-secret-key
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
+ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173

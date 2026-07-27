@@ -4,15 +4,39 @@ from sqlalchemy.orm import Session
 from auth.deps import get_current_user
 from common import Message
 from database import get_db
-from models import Station
+from models import NoiseReading, Station
 from stations.schemas import StationCreate, StationRead, StationUpdate
 
 router = APIRouter(prefix="/stations", tags=["stations"], dependencies=[Depends(get_current_user)])
 
 
+def station_with_latest_reading(db: Session, station: Station) -> dict:
+    latest_reading = (
+        db.query(NoiseReading)
+        .filter(NoiseReading.station_id == station.id)
+        .order_by(NoiseReading.recorded_at.desc())
+        .first()
+    )
+    return {
+        "id": station.id,
+        "code": station.code,
+        "name": station.name,
+        "location_name": station.location_name,
+        "latitude": station.latitude,
+        "longitude": station.longitude,
+        "status": station.status,
+        "zone": station.zone,
+        "created_at": station.created_at,
+        "latest_noise_db": latest_reading.noise_db if latest_reading else None,
+        "latest_aqi": latest_reading.aqi if latest_reading else None,
+        "latest_recorded_at": latest_reading.recorded_at if latest_reading else None,
+    }
+
+
 @router.get("", response_model=list[StationRead])
-def list_stations(db: Session = Depends(get_db)) -> list[Station]:
-    return db.query(Station).order_by(Station.name).all()
+def list_stations(db: Session = Depends(get_db)) -> list[dict]:
+    stations = db.query(Station).order_by(Station.name).all()
+    return [station_with_latest_reading(db, station) for station in stations]
 
 
 @router.post("", response_model=StationRead, status_code=status.HTTP_201_CREATED)
@@ -27,11 +51,11 @@ def create_station(payload: StationCreate, db: Session = Depends(get_db)) -> Sta
 
 
 @router.get("/{station_id}", response_model=StationRead)
-def get_station(station_id: int, db: Session = Depends(get_db)) -> Station:
+def get_station(station_id: int, db: Session = Depends(get_db)) -> dict:
     station = db.get(Station, station_id)
     if not station:
         raise HTTPException(status_code=404, detail="Station not found")
-    return station
+    return station_with_latest_reading(db, station)
 
 
 @router.patch("/{station_id}", response_model=StationRead)

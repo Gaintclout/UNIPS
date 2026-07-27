@@ -55,6 +55,15 @@ function getNoiseColor(noiseLevel) {
   return "#059669";
 }
 
+function formatTimestamp(value) {
+  if (!value) return "Not available";
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return String(value);
+
+  return date.toLocaleString();
+}
+
 function getMarkerPosition(feature) {
   const coordinates = feature.geometry?.coordinates;
 
@@ -225,9 +234,23 @@ function MapContainer() {
                       <span className="font-medium">Zone:</span>{" "}
                       {properties.zone ?? "Unassigned"}
                     </p>
-                    {noiseLevel !== null && noiseLevel !== undefined && (
+                    <p>
+                      <span className="font-medium">Noise:</span>{" "}
+                      {noiseLevel !== null && noiseLevel !== undefined
+                        ? `${noiseLevel} dB`
+                        : "No reading yet"}
+                    </p>
+                    {(properties.latest_aqi !== null && properties.latest_aqi !== undefined) ||
+                    (properties.aqi !== null && properties.aqi !== undefined) ? (
                       <p>
-                        <span className="font-medium">Noise:</span> {noiseLevel} dB
+                        <span className="font-medium">AQI:</span>{" "}
+                        {properties.latest_aqi ?? properties.aqi}
+                      </p>
+                    ) : null}
+                    {(properties.latest_recorded_at || properties.recorded_at) && (
+                      <p>
+                        <span className="font-medium">Updated:</span>{" "}
+                        {formatTimestamp(properties.latest_recorded_at ?? properties.recorded_at)}
                       </p>
                     )}
                   </div>

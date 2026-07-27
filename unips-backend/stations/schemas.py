@@ -25,5 +25,8 @@ class StationUpdate(BaseModel):
 class StationRead(StationCreate):
     id: int
     created_at: datetime
+    latest_noise_db: float | None = None
+    latest_aqi: int | None = None
+    latest_recorded_at: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)
