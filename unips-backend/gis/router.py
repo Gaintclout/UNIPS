@@ -8,7 +8,7 @@ from common import Message
 from database import get_db
 from gis.schemas import GeoJsonFeatureCollection, GisZoneCreate, GisZoneRead, GisZoneUpdate
 from gis.service import station_feature
-from models import GisZone, Station
+from models import GisZone, NoiseReading, Station
 
 router = APIRouter(prefix="/gis", tags=["gis"])
 
@@ -16,7 +16,16 @@ router = APIRouter(prefix="/gis", tags=["gis"])
 @router.get("/stations.geojson", response_model=GeoJsonFeatureCollection)
 def stations_geojson(db: Session = Depends(get_db)) -> GeoJsonFeatureCollection:
     stations = db.query(Station).all()
-    return GeoJsonFeatureCollection(features=[station_feature(station) for station in stations])
+    features = []
+    for station in stations:
+        latest_reading = (
+            db.query(NoiseReading)
+            .filter(NoiseReading.station_id == station.id)
+            .order_by(NoiseReading.recorded_at.desc())
+            .first()
+        )
+        features.append(station_feature(station, latest_reading))
+    return GeoJsonFeatureCollection(features=features)
 
 
 @router.get("/zones", response_model=list[GisZoneRead])
@@ -71,12 +80,22 @@ def delete_zone(zone_id: int, db: Session = Depends(get_db)) -> Message:
 @router.get("/heatmap")
 def heatmap_points(db: Session = Depends(get_db)) -> list[dict[str, Any]]:
     stations = db.query(Station).all()
-    return [
-        {
-            "station_id": station.id,
-            "lat": station.latitude,
-            "lng": station.longitude,
-            "weight": 0.7 if station.status == "active" else 0.25,
-        }
-        for station in stations
-    ]
+    points = []
+    for station in stations:
+        latest_reading = (
+            db.query(NoiseReading)
+            .filter(NoiseReading.station_id == station.id)
+            .order_by(NoiseReading.recorded_at.desc())
+            .first()
+        )
+        latest_noise = latest_reading.noise_db if latest_reading else None
+        points.append(
+            {
+                "station_id": station.id,
+                "lat": station.latitude,
+                "lng": station.longitude,
+                "latest_noise_db": latest_noise,
+                "weight": min(1.0, max(0.1, (latest_noise or 45) / 100)),
+            }
+        )
+    return points
