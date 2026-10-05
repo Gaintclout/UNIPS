@@ -1,0 +1,22 @@
+# Python
+**/.venv/
+**/venv/
+**/__pycache__/
+*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+
+# Environment files
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.sample
+
+# Node
+**/node_modules/
+/unips-frontend/dist/
+
+# Logs and OS files
+*.log
+.DS_Store
